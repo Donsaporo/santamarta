@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Instagram, MessageCircle } from 'lucide-react';
 
 export const Footer = () => {
   return (
@@ -67,9 +67,9 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold text-lg mb-4">Síguenos</h3>
+            <h3 className="font-semibold text-lg mb-4">Conéctate con nosotros</h3>
             <p className="text-sm text-gray-300 mb-4">
-              También puede buscarnos en nuestras redes sociales
+              También puede buscarnos en nuestras redes sociales y WhatsApp
             </p>
             <div className="flex gap-4">
               <a
@@ -89,6 +89,15 @@ export const Footer = () => {
                 aria-label="Instagram"
               >
                 <Instagram size={20} />
+              </a>
+              <a
+                href="https://wa.me/50769777262?text=Hola%2C%20me%20gustar%C3%ADa%20obtener%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20servicios%20de%20Santa%20Marta"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 bg-forest-800 rounded-full hover:bg-[#25D366] transition-all duration-300 hover:scale-110"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle size={20} />
               </a>
             </div>
           </div>
