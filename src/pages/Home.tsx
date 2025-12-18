@@ -46,7 +46,7 @@ export const Home = () => {
             />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-white via-gray-50 to-white bg-clip-text text-transparent drop-shadow-lg">
-                CASA HOGAR RESIDENCIAL
+                ISABELLA GONZALEZ ACUA
               </span>
               <br />
               <span className="bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 bg-clip-text text-transparent drop-shadow-lg">
