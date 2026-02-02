@@ -25,6 +25,7 @@ export const Navbar = () => {
     { path: '/nosotros', label: 'Nosotros' },
     { path: '/servicios', label: 'Servicios' },
     { path: '/testimonios', label: 'Testimonios' },
+    { path: '/blog', label: 'Blog' },
     { path: '/contacto', label: 'Contacto' },
   ];
 

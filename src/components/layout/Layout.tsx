@@ -3,6 +3,7 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { WhatsAppButton } from '../ui/WhatsAppButton';
 import { useScrollToTop } from '../../hooks/useScrollToTop';
+import { usePageTracking } from '../../hooks/usePageTracking';
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,6 +11,7 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   useScrollToTop();
+  usePageTracking();
 
   return (
     <div className="flex flex-col min-h-screen">
