@@ -2,19 +2,21 @@ import { Heart, Shield, Users, MessageCircle, HeartHandshake, Home as HomeIcon }
 import { Button } from '../components/ui/Button';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { SEO } from '../components/SEO';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 export const Home = () => {
   const heroRef = useScrollAnimation();
   const valuesRef = useScrollAnimation();
   const introRef = useScrollAnimation();
+  const { getText } = useSiteContent();
 
   const values = [
-    { icon: Heart, title: 'Dignidad', color: 'text-forest-600' },
-    { icon: MessageCircle, title: 'Comunicación', color: 'text-forest-600' },
-    { icon: HeartHandshake, title: 'Amor', color: 'text-forest-600' },
-    { icon: Users, title: 'Empatía', color: 'text-forest-600' },
-    { icon: Shield, title: 'Seguridad', color: 'text-forest-600' },
-    { icon: HomeIcon, title: 'Protección', color: 'text-forest-600' },
+    { icon: Heart, title: getText('value_1', 'Dignidad'), color: 'text-forest-600' },
+    { icon: MessageCircle, title: getText('value_2', 'Comunicación'), color: 'text-forest-600' },
+    { icon: HeartHandshake, title: getText('value_3', 'Amor'), color: 'text-forest-600' },
+    { icon: Users, title: getText('value_4', 'Empatía'), color: 'text-forest-600' },
+    { icon: Shield, title: getText('value_5', 'Seguridad'), color: 'text-forest-600' },
+    { icon: HomeIcon, title: getText('value_6', 'Protección'), color: 'text-forest-600' },
   ];
 
 
@@ -46,27 +48,27 @@ export const Home = () => {
             />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-white via-gray-50 to-white bg-clip-text text-transparent drop-shadow-lg">
-                CASA HOGAR RESIDENCIAL
+                {getText('hero_heading_1', 'CASA HOGAR RESIDENCIAL')}
               </span>
               <br />
               <span className="bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 bg-clip-text text-transparent drop-shadow-lg">
-                SANTA MARTA
+                {getText('hero_heading_2', 'SANTA MARTA')}
               </span>
             </h1>
             <p className="text-xl sm:text-2xl md:text-3xl mb-4 font-light">
               <span className="bg-gradient-to-r from-white to-gray-100 bg-clip-text text-transparent drop-shadow-md">
-                Vida, Salud y Familia.
+                {getText('hero_tagline', 'Vida, Salud y Familia.')}
               </span>
             </p>
             <p className="text-lg sm:text-xl md:text-2xl mb-12 text-white/95 max-w-3xl mx-auto drop-shadow-md">
-              Dedicados al cuidado del adulto mayor.
+              {getText('hero_subtitle', 'Dedicados al cuidado del adulto mayor.')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button to="/servicios" variant="secondary" size="lg">
-                Conocer Servicios
+                {getText('hero_btn_services', 'Conocer Servicios')}
               </Button>
               <Button to="/contacto" variant="outline" size="lg" className="bg-white/10 backdrop-blur-sm border-white text-white hover:bg-white hover:text-forest-800">
-                Contactar Ahora
+                {getText('hero_btn_contact', 'Contactar Ahora')}
               </Button>
             </div>
           </div>
@@ -81,11 +83,10 @@ export const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-forest-900 mb-4">
-              Nuestros Valores
+              {getText('values_title', 'Nuestros Valores')}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              En Santa Marta brindamos a nuestros residentes un servicio completo y permanente,
-              con un equipo calificado que garantiza su bienestar y calidad de vida.
+              {getText('values_description', 'En Santa Marta brindamos a nuestros residentes un servicio completo y permanente, con un equipo calificado que garantiza su bienestar y calidad de vida.')}
             </p>
           </div>
 
@@ -125,27 +126,22 @@ export const Home = () => {
               }`}
             >
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-forest-900 mb-6">
-                Más de 25 años cuidando a nuestros adultos mayores
+                {getText('about_title', 'Más de 25 años cuidando a nuestros adultos mayores')}
               </h2>
               <div className="space-y-4 text-gray-700 leading-relaxed">
                 <p className="text-lg">
-                  Santa Marta, fundada en 1999 por empresarios panameños, ofrece atención
-                  integral y de calidad a la tercera edad, con más de 25 años de experiencia
-                  y certificación del MIDES.
+                  {getText('about_paragraph_1', 'Santa Marta, fundada en 1999 por empresarios panameños, ofrece atención integral y de calidad a la tercera edad, con más de 25 años de experiencia y certificación del MIDES.')}
                 </p>
                 <p className="text-lg">
-                  Nuestro servicio se centra en preservar la calidad de vida en un ambiente de
-                  paz, amor y armonía, respetando la diversidad cultural y religiosa.
+                  {getText('about_paragraph_2', 'Nuestro servicio se centra en preservar la calidad de vida en un ambiente de paz, amor y armonía, respetando la diversidad cultural y religiosa.')}
                 </p>
                 <p className="text-lg">
-                  Contamos con un equipo especializado de médicos, enfermeras y cuidadores,
-                  además de instalaciones seguras con áreas sociales, dormitorios equipados y
-                  sistemas de seguridad.
+                  {getText('about_paragraph_3', 'Contamos con un equipo especializado de médicos, enfermeras y cuidadores, además de instalaciones seguras con áreas sociales, dormitorios equipados y sistemas de seguridad.')}
                 </p>
               </div>
               <div className="mt-8">
                 <Button to="/nosotros" variant="primary" size="lg">
-                  Conocer Más
+                  {getText('about_btn_text', 'Conocer Más')}
                 </Button>
               </div>
             </div>
@@ -165,8 +161,12 @@ export const Home = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-forest-900/50 to-transparent" />
               </div>
               <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-6 max-w-xs">
-                <p className="text-4xl font-bold text-forest-700 mb-2">25+</p>
-                <p className="text-gray-700 font-medium">Años de experiencia</p>
+                <p className="text-4xl font-bold text-forest-700 mb-2">
+                  {getText('about_experience_number', '25+')}
+                </p>
+                <p className="text-gray-700 font-medium">
+                  {getText('about_experience_text', 'Años de experiencia')}
+                </p>
               </div>
             </div>
           </div>
@@ -177,14 +177,13 @@ export const Home = () => {
       <section className="py-20 bg-gradient-to-br from-forest-800 to-forest-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-            ¿Necesita más información?
+            {getText('cta_title', '¿Necesita más información?')}
           </h2>
           <p className="text-xl mb-8 text-gray-200 max-w-2xl mx-auto">
-            Estamos aquí para ayudarle. Contáctenos y con gusto le brindaremos toda la
-            información que necesite para su ser querido.
+            {getText('cta_description', 'Estamos aquí para ayudarle. Contáctenos y con gusto le brindaremos toda la información que necesite para su ser querido.')}
           </p>
           <Button to="/contacto" variant="secondary" size="lg">
-            Contactar Ahora
+            {getText('cta_btn_text', 'Contactar Ahora')}
           </Button>
         </div>
       </section>

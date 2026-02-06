@@ -7,7 +7,8 @@ import {
   Menu,
   X,
   BarChart3,
-  FolderOpen
+  FolderOpen,
+  Type
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -31,6 +32,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
     { path: '/admin/analytics', label: 'Analiticas', icon: BarChart3 },
     { path: '/admin/posts', label: 'Blog Posts', icon: FileText },
     { path: '/admin/categories', label: 'Categorias', icon: FolderOpen },
+    { path: '/admin/content', label: 'Contenido', icon: Type },
   ];
 
   const isActive = (path: string) => {

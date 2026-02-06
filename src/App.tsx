@@ -18,6 +18,7 @@ import { AdminAnalytics } from './pages/admin/AdminAnalytics';
 import { AdminPosts } from './pages/admin/AdminPosts';
 import { AdminPostEditor } from './pages/admin/AdminPostEditor';
 import { AdminCategories } from './pages/admin/AdminCategories';
+import { AdminSiteContent } from './pages/admin/AdminSiteContent';
 
 function App() {
   return (
@@ -74,6 +75,16 @@ function App() {
                 <ProtectedRoute>
                   <AdminLayout>
                     <AdminCategories />
+                  </AdminLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/content"
+              element={
+                <ProtectedRoute>
+                  <AdminLayout>
+                    <AdminSiteContent />
                   </AdminLayout>
                 </ProtectedRoute>
               }
