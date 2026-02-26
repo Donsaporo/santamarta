@@ -57,7 +57,7 @@ Dentro de MySQL ejecuta (cambia `TU_PASSWORD_SEGURA` por una contrasena real):
 
 ```sql
 CREATE DATABASE santa_marta CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'santa_marta_user'@'localhost' IDENTIFIED BY 'TU_PASSWORD_SEGURA';
+CREATE USER 'santa_marta_user'@'localhost' IDENTIFIED BY 'Panama123$';
 GRANT ALL PRIVILEGES ON santa_marta.* TO 'santa_marta_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
