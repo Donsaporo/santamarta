@@ -12,7 +12,9 @@ import {
   Heading2,
   LinkIcon,
   Upload,
-  X
+  X,
+  Link2,
+  Film
 } from 'lucide-react';
 import { api, BlogPost, BlogCategory } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -28,6 +30,9 @@ export const AdminPostEditor = () => {
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
+  const [videoMode, setVideoMode] = useState<'link' | 'upload'>('link');
 
   const [form, setForm] = useState({
     title: '',
@@ -112,6 +117,49 @@ export const AdminPostEditor = () => {
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 200 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('El video excede el limite de 200MB');
+      return;
+    }
+
+    setUploadingVideo(true);
+    setVideoUploadProgress(0);
+
+    const fakeProgress = setInterval(() => {
+      setVideoUploadProgress(prev => {
+        if (prev >= 90) { clearInterval(fakeProgress); return prev; }
+        return prev + 10;
+      });
+    }, 500);
+
+    try {
+      const url = await api.uploadVideo(file);
+      setVideoUploadProgress(100);
+      setForm(prev => ({ ...prev, video_url: url }));
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Error al subir video';
+      alert(msg);
+    } finally {
+      clearInterval(fakeProgress);
+      setUploadingVideo(false);
+      setVideoUploadProgress(0);
+    }
+  };
+
+  const isUploadedVideo = (url: string) => {
+    return url && (url.startsWith('/api/uploads/') || url.startsWith('/uploads/'));
+  };
+
+  const isEmbedUrl = (url: string) => {
+    if (!url) return false;
+    return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
   };
 
   const insertFormatting = (before: string, after: string = before) => {
@@ -335,6 +383,28 @@ export const AdminPostEditor = () => {
                   >
                     <Image className="w-4 h-4" />
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = prompt('URL del video (YouTube, Vimeo, o enlace directo):');
+                      if (!url) return;
+                      const youtubeMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                      const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+                      let html = '';
+                      if (youtubeMatch) {
+                        html = `<div class="aspect-video my-4"><iframe src="https://www.youtube.com/embed/${youtubeMatch[1]}" class="w-full h-full rounded-lg" allowfullscreen></iframe></div>`;
+                      } else if (vimeoMatch) {
+                        html = `<div class="aspect-video my-4"><iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" class="w-full h-full rounded-lg" allowfullscreen></iframe></div>`;
+                      } else {
+                        html = `<video src="${url}" controls class="w-full rounded-lg my-4"></video>`;
+                      }
+                      insertFormatting(html, '');
+                    }}
+                    className="p-2 hover:bg-gray-200 rounded transition-colors"
+                    title="Insertar video"
+                  >
+                    <Video className="w-4 h-4" />
+                  </button>
                 </div>
                 <textarea
                   id="content-editor"
@@ -400,16 +470,106 @@ export const AdminPostEditor = () => {
               <Video className="w-5 h-5" />
               Video (opcional)
             </h3>
-            <input
-              type="url"
-              value={form.video_url}
-              onChange={(e) => setForm(prev => ({ ...prev, video_url: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
-              placeholder="URL de YouTube o Vimeo..."
-            />
-            <p className="text-xs text-gray-500 mt-2">
-              Ejemplo: https://www.youtube.com/watch?v=...
-            </p>
+
+            <div className="flex rounded-lg border border-gray-300 overflow-hidden mb-4">
+              <button
+                type="button"
+                onClick={() => setVideoMode('link')}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  videoMode === 'link'
+                    ? 'bg-forest-600 text-white'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Link2 className="w-4 h-4" />
+                Enlace
+              </button>
+              <button
+                type="button"
+                onClick={() => setVideoMode('upload')}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  videoMode === 'upload'
+                    ? 'bg-forest-600 text-white'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Upload className="w-4 h-4" />
+                Subir
+              </button>
+            </div>
+
+            {form.video_url && (
+              <div className="mb-4">
+                <div className="relative rounded-lg overflow-hidden bg-gray-900">
+                  {isUploadedVideo(form.video_url) ? (
+                    <video
+                      src={form.video_url}
+                      className="w-full aspect-video object-contain"
+                      controls
+                    />
+                  ) : isEmbedUrl(form.video_url) ? (
+                    <div className="flex items-center gap-2 p-3 bg-forest-50 rounded-lg">
+                      <Film className="w-5 h-5 text-forest-600 shrink-0" />
+                      <span className="text-sm text-forest-700 truncate">{form.video_url}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                      <Video className="w-5 h-5 text-gray-500 shrink-0" />
+                      <span className="text-sm text-gray-600 truncate">{form.video_url}</span>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setForm(prev => ({ ...prev, video_url: '' }))}
+                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {videoMode === 'link' ? (
+              <div>
+                <input
+                  type="url"
+                  value={isUploadedVideo(form.video_url) ? '' : form.video_url}
+                  onChange={(e) => setForm(prev => ({ ...prev, video_url: e.target.value }))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
+                  placeholder="URL de YouTube, Vimeo, etc..."
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Soporta YouTube y Vimeo. El video se incrustara automaticamente.
+                </p>
+              </div>
+            ) : (
+              <div>
+                {uploadingVideo ? (
+                  <div className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg">
+                    <div className="w-8 h-8 border-4 border-forest-500 border-t-transparent rounded-full animate-spin mb-3" />
+                    <div className="w-3/4 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-forest-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${videoUploadProgress}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-500 mt-2">Subiendo video... {videoUploadProgress}%</span>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-forest-500 transition-colors">
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                      onChange={handleVideoUpload}
+                      className="hidden"
+                    />
+                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-500">Subir video</span>
+                    <span className="text-xs text-gray-400 mt-1">MP4, WebM, OGG (max 200MB)</span>
+                  </label>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

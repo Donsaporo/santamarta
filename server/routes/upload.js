@@ -15,13 +15,16 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
+const imageExtensions = /jpeg|jpg|png|gif|webp|svg/;
+const videoExtensions = /mp4|webm|ogg|mov|avi|mkv/;
+const videoMimeTypes = /video\/(mp4|webm|ogg|quicktime|x-msvideo|x-matroska)/;
+
+const imageUpload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp|svg/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype.split('/')[1]);
+    const ext = imageExtensions.test(path.extname(file.originalname).toLowerCase());
+    const mime = imageExtensions.test(file.mimetype.split('/')[1]);
     if (ext || mime) {
       cb(null, true);
     } else {
@@ -30,8 +33,22 @@ const upload = multer({
   },
 });
 
+const videoUpload = multer({
+  storage,
+  limits: { fileSize: 200 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = videoExtensions.test(path.extname(file.originalname).toLowerCase().replace('.', ''));
+    const mime = videoMimeTypes.test(file.mimetype);
+    if (ext || mime) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten videos (mp4, webm, ogg, mov)'));
+    }
+  },
+});
+
 router.post('/', authRequired, (req, res) => {
-  upload.single('image')(req, res, (err) => {
+  imageUpload.single('image')(req, res, (err) => {
     if (err) {
       console.error('Multer upload error:', err);
       return res.status(500).json({ error: err.message || 'Error al subir imagen' });
@@ -41,6 +58,23 @@ router.post('/', authRequired, (req, res) => {
     }
     const url = `/api/uploads/${req.file.filename}`;
     res.json({ url });
+  });
+});
+
+router.post('/video', authRequired, (req, res) => {
+  videoUpload.single('video')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({ error: 'El video excede el limite de 200MB' });
+      }
+      console.error('Video upload error:', err);
+      return res.status(500).json({ error: err.message || 'Error al subir video' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se recibio video' });
+    }
+    const url = `/api/uploads/${req.file.filename}`;
+    res.json({ url, type: 'video' });
   });
 });
 

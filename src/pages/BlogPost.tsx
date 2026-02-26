@@ -57,6 +57,17 @@ export const BlogPost = () => {
   const getVideoEmbed = (url: string) => {
     if (!url) return null;
 
+    if (url.startsWith('/api/uploads/') || url.startsWith('/uploads/')) {
+      return (
+        <video
+          src={url}
+          className="w-full aspect-video rounded-xl bg-black"
+          controls
+          preload="metadata"
+        />
+      );
+    }
+
     const youtubeMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
     if (youtubeMatch) {
       return (

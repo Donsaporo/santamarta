@@ -159,4 +159,21 @@ export const api = {
     const data = await res.json();
     return data.url;
   },
+
+  uploadVideo: async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('video', file);
+    const token = getToken();
+    const res = await fetch(`${API_URL}/upload/video`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: 'Error al subir video' }));
+      throw new Error(body.error || 'Error al subir video');
+    }
+    const data = await res.json();
+    return data.url;
+  },
 };
