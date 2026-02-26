@@ -67,11 +67,11 @@ const getGeoData = async (): Promise<GeoData> => {
   }
 
   try {
-    const res = await fetch('http://ip-api.com/json/?fields=country,city');
+    const res = await fetch('https://ipapi.co/json/');
     if (res.ok) {
       const json = await res.json();
       const data: GeoData = {
-        country: json.country || '',
+        country: json.country_name || '',
         city: json.city || '',
       };
       sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(data));

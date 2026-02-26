@@ -34,7 +34,7 @@ router.post('/', authRequired, upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No se recibio imagen' });
   }
-  const url = `/uploads/${req.file.filename}`;
+  const url = `/api/uploads/${req.file.filename}`;
   res.json({ url });
 });
 
