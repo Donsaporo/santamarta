@@ -3,6 +3,13 @@ const { v4: uuid } = require('uuid');
 const db = require('../db');
 const { authRequired } = require('../middleware/auth');
 
+function toMysqlDatetime(isoString) {
+  if (!isoString) return null;
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+}
+
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -115,7 +122,7 @@ router.post('/', authRequired, async (req, res) => {
     await db.execute(
       `INSERT INTO blog_posts (id, title, slug, content, excerpt, featured_image, video_url, category_id, author_id, status, published_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [id, title, slug, content || '', excerpt || '', featured_image || '', video_url || '', category_id || null, req.user.id, status || 'draft', published_at || null]
+      [id, title, slug, content || '', excerpt || '', featured_image || '', video_url || '', category_id || null, req.user.id, status || 'draft', toMysqlDatetime(published_at)]
     );
 
     res.json({ id });
@@ -132,7 +139,7 @@ router.put('/:id', authRequired, async (req, res) => {
     await db.execute(
       `UPDATE blog_posts SET title=?, slug=?, content=?, excerpt=?, featured_image=?, video_url=?, category_id=?, status=?, published_at=?, updated_at=NOW()
        WHERE id=?`,
-      [title, slug, content || '', excerpt || '', featured_image || '', video_url || '', category_id || null, status || 'draft', published_at || null, req.params.id]
+      [title, slug, content || '', excerpt || '', featured_image || '', video_url || '', category_id || null, status || 'draft', toMysqlDatetime(published_at), req.params.id]
     );
 
     res.json({ success: true });
