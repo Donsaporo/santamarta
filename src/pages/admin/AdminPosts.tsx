@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Search, Edit, Trash2, Eye, FileText } from 'lucide-react';
-import { supabase, BlogPost, BlogCategory } from '../../lib/supabase';
+import { api, BlogPost, BlogCategory } from '../../lib/api';
 
 export const AdminPosts = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -17,16 +17,13 @@ export const AdminPosts = () => {
 
   const fetchData = async () => {
     try {
-      const [postsResult, categoriesResult] = await Promise.all([
-        supabase
-          .from('blog_posts')
-          .select('*, category:blog_categories(*)')
-          .order('created_at', { ascending: false }),
-        supabase.from('blog_categories').select('*'),
+      const [postsData, categoriesData] = await Promise.all([
+        api.posts.list(),
+        api.categories.list(),
       ]);
 
-      setPosts(postsResult.data || []);
-      setCategories(categoriesResult.data || []);
+      setPosts(postsData);
+      setCategories(categoriesData);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -36,7 +33,7 @@ export const AdminPosts = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await supabase.from('blog_posts').delete().eq('id', id);
+      await api.posts.delete(id);
       setPosts(posts.filter(p => p.id !== id));
       setDeleteId(null);
     } catch (error) {

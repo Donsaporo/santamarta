@@ -14,7 +14,7 @@ import {
   Upload,
   X
 } from 'lucide-react';
-import { supabase, BlogPost, BlogCategory } from '../../lib/supabase';
+import { api, BlogPost, BlogCategory } from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const AdminPostEditor = () => {
@@ -48,17 +48,17 @@ export const AdminPostEditor = () => {
   }, [id, isNew]);
 
   const fetchCategories = async () => {
-    const { data } = await supabase.from('blog_categories').select('*').order('name');
-    setCategories(data || []);
+    try {
+      const data = await api.categories.list();
+      setCategories(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
   };
 
   const fetchPost = async (postId: string) => {
     try {
-      const { data } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('id', postId)
-        .maybeSingle();
+      const data = await api.posts.get(postId);
 
       if (data) {
         setForm({
@@ -104,21 +104,8 @@ export const AdminPostEditor = () => {
 
     setUploadingImage(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `posts/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('blog-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('blog-images')
-        .getPublicUrl(filePath);
-
-      setForm(prev => ({ ...prev, featured_image: publicUrl }));
+      const url = await api.upload(file);
+      setForm(prev => ({ ...prev, featured_image: url }));
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Error al subir la imagen');
@@ -157,7 +144,7 @@ export const AdminPostEditor = () => {
 
     setSaving(true);
     try {
-      const postData = {
+      const postData: Partial<BlogPost> = {
         title: form.title,
         slug: form.slug || generateSlug(form.title),
         content: form.content,
@@ -167,19 +154,13 @@ export const AdminPostEditor = () => {
         category_id: form.category_id || null,
         status: publish ? 'published' : form.status,
         published_at: publish ? new Date().toISOString() : null,
-        author_id: user?.id,
-        updated_at: new Date().toISOString(),
+        author_id: user?.id || null,
       };
 
       if (isNew) {
-        const { error } = await supabase.from('blog_posts').insert([postData]);
-        if (error) throw error;
+        await api.posts.create(postData);
       } else {
-        const { error } = await supabase
-          .from('blog_posts')
-          .update(postData)
-          .eq('id', id);
-        if (error) throw error;
+        await api.posts.update(id!, postData);
       }
 
       navigate('/admin/posts');

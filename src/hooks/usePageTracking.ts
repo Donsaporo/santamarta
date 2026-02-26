@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 
 const GEO_CACHE_KEY = 'analytics_geo_data';
 const SESSION_KEY = 'analytics_session_id';
@@ -48,13 +48,7 @@ const getCleanReferrer = (): string => {
   if (!ref) return '';
   try {
     const url = new URL(ref);
-    const ownDomains = [
-      'santamartapanama.com',
-      'www.santamartapanama.com',
-      window.location.hostname,
-    ];
-    if (ownDomains.includes(url.hostname)) return '';
-    if (url.hostname.includes('webcontainer')) return '';
+    if (url.hostname === window.location.hostname) return '';
     return url.hostname;
   } catch {
     return '';
@@ -99,7 +93,7 @@ export const usePageTracking = () => {
       const geo = await getGeoData();
 
       try {
-        await supabase.from('page_views').insert([{
+        await api.analytics.track({
           page_path: path,
           page_title: document.title,
           referrer: getCleanReferrer(),
@@ -110,7 +104,7 @@ export const usePageTracking = () => {
           country: geo.country,
           city: geo.city,
           session_id: getSessionId(),
-        }]);
+        });
       } catch (error) {
         console.error('Error tracking page view:', error);
       }

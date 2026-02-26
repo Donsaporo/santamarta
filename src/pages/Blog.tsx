@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, ArrowRight, Tag, Search } from 'lucide-react';
-import { supabase, BlogPost, BlogCategory } from '../lib/supabase';
+import { api, BlogPost, BlogCategory } from '../lib/api';
 import { SEO } from '../components/SEO';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
@@ -21,17 +21,13 @@ export const Blog = () => {
 
   const fetchData = async () => {
     try {
-      const [postsResult, categoriesResult] = await Promise.all([
-        supabase
-          .from('blog_posts')
-          .select('*, category:blog_categories(*)')
-          .eq('status', 'published')
-          .order('published_at', { ascending: false }),
-        supabase.from('blog_categories').select('*').order('name'),
+      const [postsData, categoriesData] = await Promise.all([
+        api.posts.list({ status: 'published' }),
+        api.categories.list(),
       ]);
 
-      setPosts(postsResult.data || []);
-      setCategories(categoriesResult.data || []);
+      setPosts(postsData);
+      setCategories(categoriesData);
     } catch (error) {
       console.error('Error fetching blog data:', error);
     } finally {

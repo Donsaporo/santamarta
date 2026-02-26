@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Eye, FileText, TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
-import { supabase, BlogPost } from '../../lib/supabase';
+import { api, BlogPost } from '../../lib/api';
 import { LineChart } from '../../components/admin/charts/LineChart';
 
 interface DashboardStats {
@@ -45,17 +45,11 @@ export const AdminDashboard = () => {
       const twoWeeksAgo = new Date();
       twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
-      const [viewsResult, postsResult, recentPostsResult] = await Promise.all([
-        supabase.from('page_views').select('*'),
-        supabase.from('blog_posts').select('*'),
-        supabase.from('blog_posts')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5),
+      const [views, posts] = await Promise.all([
+        api.analytics.list(),
+        api.posts.list(),
       ]);
 
-      const views = viewsResult.data || [];
-      const posts = postsResult.data || [];
 
       const todayViews = views.filter(v => new Date(v.created_at) >= today).length;
       const weekViews = views.filter(v => new Date(v.created_at) >= weekAgo).length;
@@ -90,14 +84,14 @@ export const AdminDashboard = () => {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        const dayViews = views.filter(v => v.created_at.split('T')[0] === dateStr).length;
+        const dayViews = views.filter(v => new Date(v.created_at).toISOString().split('T')[0] === dateStr).length;
         last7Days.push({
           label: date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }),
           value: dayViews,
         });
       }
       setRecentViews(last7Days);
-      setRecentPosts(recentPostsResult.data || []);
+      setRecentPosts(posts.slice(0, 5));
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {

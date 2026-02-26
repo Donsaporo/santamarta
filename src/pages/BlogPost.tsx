@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, ArrowLeft, Tag, Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
-import { supabase, BlogPost as BlogPostType } from '../lib/supabase';
+import { api, BlogPost as BlogPostType } from '../lib/api';
 import { SEO } from '../components/SEO';
 
 export const BlogPost = () => {
@@ -19,30 +19,24 @@ export const BlogPost = () => {
 
   const fetchPost = async (postSlug: string) => {
     try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*, category:blog_categories(*)')
-        .eq('slug', postSlug)
-        .eq('status', 'published')
-        .maybeSingle();
+      const posts = await api.posts.list({ slug: postSlug, status: 'published' });
 
-      if (error || !data) {
+      if (!posts.length) {
         setNotFound(true);
         return;
       }
 
+      const data = posts[0];
       setPost(data);
 
       if (data.category_id) {
-        const { data: related } = await supabase
-          .from('blog_posts')
-          .select('*, category:blog_categories(*)')
-          .eq('status', 'published')
-          .eq('category_id', data.category_id)
-          .neq('id', data.id)
-          .limit(3);
-
-        setRelatedPosts(related || []);
+        const related = await api.posts.list({
+          status: 'published',
+          category_id: data.category_id,
+          exclude: data.id,
+          limit: 3,
+        });
+        setRelatedPosts(related);
       }
     } catch (error) {
       console.error('Error fetching post:', error);
@@ -121,7 +115,7 @@ export const BlogPost = () => {
   if (notFound || !post) {
     return (
       <>
-        <SEO title="Articulo no encontrado | Residencial Santa Marta" />
+        <SEO title="Articulo no encontrado | Residencial Santa Marta" description="El articulo que buscas no existe o ha sido eliminado." />
         <div className="min-h-screen flex flex-col items-center justify-center pt-20 px-4">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Articulo no encontrado</h1>
           <p className="text-gray-600 mb-8">El articulo que buscas no existe o ha sido eliminado.</p>
@@ -142,7 +136,7 @@ export const BlogPost = () => {
       <SEO
         title={`${post.title} | Blog | Residencial Santa Marta`}
         description={post.excerpt || post.title}
-        image={post.featured_image}
+        ogImage={post.featured_image}
       />
 
       <article className="pt-24 pb-20">

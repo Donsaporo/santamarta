@@ -1,13 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-
-interface SiteContentItem {
-  key: string;
-  value: string;
-  section: string;
-  label: string;
-  field_type: 'input' | 'textarea';
-}
+import { api, SiteContentItem } from '../lib/api';
 
 let cachedContent: Record<string, string> | null = null;
 
@@ -20,18 +12,13 @@ export const useSiteContent = () => {
 
     const fetchContent = async () => {
       try {
-        const { data } = await supabase
-          .from('site_content')
-          .select('key, value');
-
-        if (data) {
-          const map: Record<string, string> = {};
-          data.forEach((item: { key: string; value: string }) => {
-            map[item.key] = item.value;
-          });
-          cachedContent = map;
-          setContent(map);
-        }
+        const data = await api.content.list();
+        const map: Record<string, string> = {};
+        data.forEach((item: { key: string; value: string }) => {
+          map[item.key] = item.value;
+        });
+        cachedContent = map;
+        setContent(map);
       } catch (error) {
         console.error('Error fetching site content:', error);
       } finally {
@@ -60,12 +47,8 @@ export const useSiteContentAdmin = () => {
 
   const fetchAll = async () => {
     try {
-      const { data } = await supabase
-        .from('site_content')
-        .select('key, value, section, label, field_type')
-        .order('section');
-
-      setItems((data as SiteContentItem[]) || []);
+      const data = await api.content.list();
+      setItems(data);
     } catch (error) {
       console.error('Error fetching site content:', error);
     } finally {
@@ -84,12 +67,7 @@ export const useSiteContentAdmin = () => {
     try {
       const sectionItems = items.filter(item => item.section === section);
       for (const item of sectionItems) {
-        const { error } = await supabase
-          .from('site_content')
-          .update({ value: item.value, updated_at: new Date().toISOString() })
-          .eq('key', item.key);
-
-        if (error) throw error;
+        await api.content.update(item.key, item.value);
       }
       cachedContent = null;
       return true;

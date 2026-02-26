@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Calendar, Monitor, Globe, Link2, Chrome, MapPin } from 'lucide-react';
-import { supabase, PageView } from '../../lib/supabase';
+import { api, PageView } from '../../lib/api';
 import { LineChart } from '../../components/admin/charts/LineChart';
 import { BarChart } from '../../components/admin/charts/BarChart';
 import { PieChart } from '../../components/admin/charts/PieChart';
@@ -23,13 +23,8 @@ export const AdminAnalytics = () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - daysAgo);
 
-      const { data } = await supabase
-        .from('page_views')
-        .select('*')
-        .gte('created_at', startDate.toISOString())
-        .order('created_at', { ascending: true });
-
-      setPageViews(data || []);
+      const data = await api.analytics.list(startDate.toISOString());
+      setPageViews(data);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -46,7 +41,7 @@ export const AdminAnalytics = () => {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      const count = pageViews.filter(v => v.created_at.split('T')[0] === dateStr).length;
+      const count = pageViews.filter(v => new Date(v.created_at).toISOString().split('T')[0] === dateStr).length;
       result.push({
         label: date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }),
         value: count,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, FolderOpen, X, Check } from 'lucide-react';
-import { supabase, BlogCategory } from '../../lib/supabase';
+import { api, BlogCategory } from '../../lib/api';
 
 export const AdminCategories = () => {
   const [categories, setCategories] = useState<BlogCategory[]>([]);
@@ -17,11 +17,8 @@ export const AdminCategories = () => {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await supabase
-        .from('blog_categories')
-        .select('*')
-        .order('name');
-      setCategories(data || []);
+      const data = await api.categories.list();
+      setCategories(data);
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
@@ -65,16 +62,9 @@ export const AdminCategories = () => {
     setSaving(true);
     try {
       if (editingId) {
-        const { error } = await supabase
-          .from('blog_categories')
-          .update({ name: form.name, slug: form.slug })
-          .eq('id', editingId);
-        if (error) throw error;
+        await api.categories.update(editingId, { name: form.name, slug: form.slug });
       } else {
-        const { error } = await supabase
-          .from('blog_categories')
-          .insert([{ name: form.name, slug: form.slug }]);
-        if (error) throw error;
+        await api.categories.create({ name: form.name, slug: form.slug });
       }
 
       setShowModal(false);
@@ -89,7 +79,7 @@ export const AdminCategories = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await supabase.from('blog_categories').delete().eq('id', id);
+      await api.categories.delete(id);
       setCategories(categories.filter(c => c.id !== id));
       setDeleteId(null);
     } catch (error) {
