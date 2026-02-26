@@ -30,12 +30,18 @@ const upload = multer({
   },
 });
 
-router.post('/', authRequired, upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No se recibio imagen' });
-  }
-  const url = `/api/uploads/${req.file.filename}`;
-  res.json({ url });
+router.post('/', authRequired, (req, res) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('Multer upload error:', err);
+      return res.status(500).json({ error: err.message || 'Error al subir imagen' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se recibio imagen' });
+    }
+    const url = `/api/uploads/${req.file.filename}`;
+    res.json({ url });
+  });
 });
 
 module.exports = router;

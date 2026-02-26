@@ -12,8 +12,8 @@ export const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const heroRef = useScrollAnimation<HTMLDivElement>();
-  const postsRef = useScrollAnimation<HTMLDivElement>();
+  const hero = useScrollAnimation();
+  const postsSection = useScrollAnimation();
 
   useEffect(() => {
     fetchData();
@@ -60,8 +60,8 @@ export const Blog = () => {
 
       <section className="relative pt-32 pb-20 bg-gradient-to-br from-forest-50 via-white to-sage-50">
         <div
-          ref={heroRef}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 opacity-0 translate-y-5"
+          ref={hero.ref}
+          className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ${hero.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
         >
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-h1 text-gray-900 mb-6">
@@ -118,8 +118,8 @@ export const Blog = () => {
 
       <section className="py-20 bg-white">
         <div
-          ref={postsRef}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 opacity-0 translate-y-5"
+          ref={postsSection.ref}
+          className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-700 ${postsSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
         >
           {loading ? (
             <div className="flex items-center justify-center py-20">

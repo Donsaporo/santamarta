@@ -10,6 +10,13 @@ function toMysqlDatetime(isoString) {
   return d.toISOString().slice(0, 19).replace('T', ' ');
 }
 
+function normalizeImageUrl(url) {
+  if (url && url.startsWith('/uploads/')) {
+    return '/api' + url;
+  }
+  return url || '';
+}
+
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -61,7 +68,7 @@ router.get('/', async (req, res) => {
       slug: row.slug,
       content: row.content,
       excerpt: row.excerpt,
-      featured_image: row.featured_image,
+      featured_image: normalizeImageUrl(row.featured_image),
       video_url: row.video_url,
       category_id: row.category_id,
       author_id: row.author_id,
@@ -101,6 +108,7 @@ router.get('/:id', async (req, res) => {
     const row = rows[0];
     res.json({
       ...row,
+      featured_image: normalizeImageUrl(row.featured_image),
       category: row.cat_id ? {
         id: row.cat_id,
         name: row.cat_name,
