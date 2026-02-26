@@ -225,8 +225,8 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    # Cache para assets estaticos
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?)$ {
+    # Cache para assets estaticos (excluye /api/ para no interferir con uploads)
+    location ~* ^(?!/api/).*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?)$ {
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
