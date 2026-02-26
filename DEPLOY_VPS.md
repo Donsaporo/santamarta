@@ -119,14 +119,14 @@ npm run build
 Backend:
 
 ```bash
-cd /var/www/santa-marta/server
+cd /var/www/santamarta/server
 npm install
 ```
 
 ## 11. Configurar variables de entorno del servidor
 
 ```bash
-nano /var/www/santa-marta/server/.env
+nano /var/www/santamarta/server/.env
 ```
 
 Contenido (cambia los valores):
@@ -134,10 +134,10 @@ Contenido (cambia los valores):
 ```
 DB_HOST=localhost
 DB_USER=santa_marta_user
-DB_PASSWORD=TU_PASSWORD_SEGURA
+DB_PASSWORD=Panama123$
 DB_NAME=santa_marta
-JWT_SECRET=GENERA_UNA_CADENA_ALEATORIA_DE_64_CARACTERES
-SETUP_KEY=UNA_CLAVE_TEMPORAL_PARA_CREAR_ADMIN
+JWT_SECRET=1aa2e87107d1b4883af6b3273d872fc739520fbbab3cc46505887d293e3ce66f8c90a48c63bf6db3cfda88d601934769
+SETUP_KEY=Panama123$
 PORT=3001
 ```
 
@@ -152,7 +152,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 Con el servidor en marcha temporalmente:
 
 ```bash
-cd /var/www/santa-marta/server
+cd /var/www/santamarta/server
 node index.js &
 ```
 
@@ -161,7 +161,7 @@ Ejecuta este comando (cambia los valores):
 ```bash
 curl -X POST http://localhost:3001/api/auth/create-admin \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@tudominio.com","password":"TuContrasenaSegura","setup_key":"UNA_CLAVE_TEMPORAL_PARA_CREAR_ADMIN"}'
+  -d '{"email":"resi_santamarta@hotmail.com","password":"Panama123$","setup_key":"Panama123$"}'
 ```
 
 Deberia responder con `{"success":true, ...}`.
